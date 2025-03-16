@@ -1,16 +1,24 @@
-# app
+# AIO Video Downloader 📥
 
-A new Flutter project.
+A Flutter-based All-In-One Video Downloader app. Paste any supported social media video URL and download it directly to your device.
 
-## Getting Started
+## Features
+- Download videos from supported social media platforms using RapidAPI.
+- Saves video directly to your Android's Downloads folder.
+- Shows download progress via a progress bar.
+- Requests proper storage/media permissions.
+- Clean and responsive UI.
 
-This project is a starting point for a Flutter application.
+## Getting Started 🚀
 
-A few resources to get you started if this is your first Flutter project:
+### Prerequisites
+- Flutter SDK (3.x.x recommended)
+- Android Studio / VS Code
+- RapidAPI key for [Social Download API](https://rapidapi.com/)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Setup
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/aliff56/AIO_video_downloader.git
+   cd AIO_video_downloader
