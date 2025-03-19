@@ -1,9 +1,14 @@
 import 'package:app/mainpage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_launcher_icons/xml_templates.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -12,9 +17,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Video Downloader',
+      title: 'VidAIO',
       theme: ThemeData(
         colorScheme: const ColorScheme.dark(),
+        scaffoldBackgroundColor: Colors.blueGrey,
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.blueGrey.shade600,
+          elevation: 0,
+        ),
         useMaterial3: true,
       ),
       home: const Mainpage(),
