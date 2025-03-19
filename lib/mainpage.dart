@@ -13,9 +13,10 @@ class Mainpage extends StatefulWidget {
 }
 
 class _MainpageState extends State<Mainpage> {
+  
   final TextEditingController _urlcontroller = TextEditingController();
   
-  final apikey = dotenv.env['API_KEY']!;
+  final apikey = dotenv.env['API_KEY'] ?? '';
   bool isDownloading = false;
   double downloadProgress = 0.0;
 
@@ -106,7 +107,7 @@ Future<void> downloadVideo(String videoUrl) async {
     setState(() {
       isDownloading = false;
     });
-
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("Video downloaded to: $filePath")),
     );
@@ -114,58 +115,104 @@ Future<void> downloadVideo(String videoUrl) async {
     setState(() {
       isDownloading = false;
     });
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("Download failed: $e")),
     );
   }
 }
+void showQualityDialog(List medias) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text("Select Quality"),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: medias.length,
+            itemBuilder: (context, index) {
+              final media = medias[index];
+              return ListTile(
+                title: Text("${media['quality']} - ${media['extension']}"),
+                subtitle: Text("${media['type']}"),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  downloadVideo(media['url']);
+                },
+              );
+            },
+          ),
+        ),
+      );
+    },
+  );
+}
 
-  void fetchUrl() async {
-    final url = _urlcontroller.text.trim();
-    if (url.isNotEmpty) {
-      try {
-        final data = await getDownloadData(url);
-        final videoUrl = data['medias']?[0]['url'];
+ void fetchUrl() async {
+  final url = _urlcontroller.text.trim();
+  if (url.isNotEmpty) {
+    try {
+      final data = await getDownloadData(url);
 
-        if (videoUrl != null) {
-          await downloadVideo(videoUrl);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("No video URL found")));
-        }
-      } catch (e) {
+
+      final List medias = data['medias'] ?? [];
+
+      if (medias.isNotEmpty) {
+        showQualityDialog(medias);
+      } else {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error: $e")));
+          const SnackBar(content: Text("No downloadable qualities found")),
+        );
       }
-    } else {
+    } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Enter a valid URL")));
+        SnackBar(content: Text("Error: $e")),
+      );
     }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Enter a valid URL")),
+    );
   }
+}
+
+  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Video Downloader'),
+        title: const Text('VidAIO'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Center(
+            
+             Center(
               child: Text(
                 'Paste URL Here:',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
               ),
             ),
+            const SizedBox(height: 10),
             TextField(
               controller: _urlcontroller,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(30))),
+                    borderRadius: BorderRadius.all(Radius.circular(30)),
+                    ),
+                    
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      borderSide: BorderSide(color: Colors.tealAccent , width: 2)
+                    ),
                 prefixIcon: Icon(Icons.link_rounded),
               ),
             ),
@@ -173,7 +220,9 @@ Future<void> downloadVideo(String videoUrl) async {
             Center(
               child: ElevatedButton(
                 onPressed: isDownloading ? null : fetchUrl,
-                child: const Text("Download Video"),
+                style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.white,), 
+                foregroundColor: WidgetStatePropertyAll(Colors.blueGrey)),
+                child:  Text("Download Video"),
               ),
             ),
             if (isDownloading) ...[
